@@ -20,6 +20,8 @@ mono_crash.*
 *.recipe
 *.vcxproj.filters
 *.vcxproj
+BoxEngine-Core/vendor/GLFW/bin
+BoxEngine-Core/vendor/GLFW/bin-int
 
 # Build results
 [Dd]ebug/

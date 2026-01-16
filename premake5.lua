@@ -22,7 +22,7 @@ workspace "BoxEngine"
     IncludeDir["ImGui"]     = "vendor/imgui/"
     IncludeDir["glm"]       = "vendor/glm"
     IncludeDir["stb_image"] = "vendor/stb_image"
-    IncludeDir["assimp"]    = "vendor/assimp"
+    IncludeDir["assimp"]    = "vendor/assimp/include"
 
     --projects
     group "Dependencies"

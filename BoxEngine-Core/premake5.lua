@@ -11,6 +11,8 @@ project "BoxEngine-Core"
 	{
 		"src/**.h",
 		"src/**.cpp",
+		"include/**.h",
+		"include/**.cpp",
 		"vendor/stb_image/**.h",
 		"vendor/stb_image/**.cpp",
 		"vendor/glm/glm/**.hpp",
