@@ -27,6 +27,7 @@ project "BoxEngine-Core"
     includedirs
 	{
 		"src",
+		"include",
 		"vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
