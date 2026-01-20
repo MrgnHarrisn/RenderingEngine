@@ -4,7 +4,6 @@
 
 int main()
 {
-    Engine engine(800, 900, "Gangsta as fuck window");
-    printf("It worked?\n");
+    Engine engine(800, 900, "BoxEngine Window");
     return 0;
 }
