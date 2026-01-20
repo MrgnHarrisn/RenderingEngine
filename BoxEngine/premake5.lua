@@ -16,10 +16,11 @@ project "BoxEngine"
 	includedirs
 	{
 		"../BoxEngine-Core/vendor/spdlog/include",
-		"../BoxEngine-Core/src",
+		"../BoxEngine-Core/include",
 		"../BoxEngine-Core/vendor",
 		"../BoxEngine-Core/%{IncludeDir.glm}",
 		"../BoxEngine-Core/%{IncludeDir.Glad}",
+		"../BoxEngine-Core/%{IncludeDir.GLFW}",
 		"../BoxEngine-Core/%{IncludeDir.ImGui}"
 	}
 

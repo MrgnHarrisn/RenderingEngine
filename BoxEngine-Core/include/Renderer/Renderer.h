@@ -1,12 +1,12 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
+#include "Core/Window.h"
 #include <cerrno>
 
 class Renderer
 {
 public:
-	Renderer(GLFWwindow* target);
+	Renderer(Window* target);
 
 	void render();
 private:
@@ -14,7 +14,7 @@ private:
 	/// Attach renderer to the window
 	/// </summary>
 	/// <param name="target">Window to render to</param>
-	void attach(GLFWwindow* target);
+	void attach(Window* target);
 
-	GLFWwindow* m_target = nullptr;
+	Window* m_target = nullptr;
 };

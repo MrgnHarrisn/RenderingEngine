@@ -13,7 +13,7 @@ public:
 	/// <param name="width">Width of the window</param>
 	/// <param name="height">Height of the window</param>
 	/// <param name="title">Title of the window</param>
-	Window(unsigned int width, unsigned int height, std::string& title);
+	Window(unsigned int width, unsigned int height, const std::string& title);
 
 	/// <summary>
 	/// Returns the target window
@@ -40,5 +40,6 @@ private:
 	GLFWwindow* m_window = nullptr;
 	unsigned int m_width, m_height;
 
+	// resize function
 	void resize_callback();
 };
