@@ -1,0 +1,15 @@
+[submodule "BoxEngine-Core/vendor/GLFW"]
+	path = BoxEngine-Core/vendor/GLFW
+	url = https://github.com/MrgnHarrisn/glfw-premake.git
+[submodule "BoxEngine-Core/vendor/imgui"]
+	path = BoxEngine-Core/vendor/imgui
+	url = https://github.com/MrgnHarrisn/imgui-premake.git
+[submodule "BoxEngine-Core/vendor/assimp"]
+	path = BoxEngine-Core/vendor/assimp
+	url = https://github.com/AminAliari/assimp.git
+[submodule "BoxEngine-Core/vendor/glm"]
+	path = BoxEngine-Core/vendor/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "BoxEngine-Core/vendor/spdlog"]
+	path = BoxEngine-Core/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
