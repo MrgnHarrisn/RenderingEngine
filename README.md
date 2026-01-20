@@ -24,6 +24,11 @@ Uses **Premake** for building.
 Install [Premake](https://premake.github.io/download) and add it to your path
 
 ```
+# clone the repository
+git clone --recursive https://github.com/MrgnHarrisn/RenderingEngine.git
+```
+
+```
 premake5 vs2022 # (window)
 premake5 gmake  # (linux)
 ```
