@@ -5,5 +5,7 @@
 int main()
 {
     Engine engine(800, 900, "BoxEngine Window");
+    engine.init();
+    engine.run();
     return 0;
 }

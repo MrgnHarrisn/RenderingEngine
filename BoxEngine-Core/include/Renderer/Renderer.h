@@ -7,7 +7,7 @@ class Renderer
 {
 public:
 	Renderer(Window* target);
-
+	void setClearColor();
 	void render();
 private:
 	/// <summary>
