@@ -8,6 +8,11 @@ Renderer::Renderer(Window* target)
 	attach(target);
 }
 
+void Renderer::setClearColor(glm::vec3 color)
+{
+	glClearColor(color.x, color.y, color.z, 1.0f);
+}
+
 void Scene::update()
 {
 

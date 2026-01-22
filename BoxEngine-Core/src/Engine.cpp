@@ -11,6 +11,11 @@ Engine::Engine(unsigned int width, unsigned int height, const std::string& title
 	m_renderer = (Renderer*)new Renderer(m_window);
 }
 
+void Engine::setClearColor(float x, float y, float z)
+{
+	m_renderer->setClearColor({ x, y, z });
+}
+
 Engine::~Engine()
 {
 	delete m_window;

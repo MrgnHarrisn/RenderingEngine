@@ -22,6 +22,14 @@ public:
 	Engine(unsigned int width, unsigned int height, const std::string& title);
 
 	/// <summary>
+	/// Set the clear color of the screen
+	/// </summary>
+	/// <param name="r">red</param>
+	/// <param name="g">green</param>
+	/// <param name="b">blue</param>
+	void setClearColor(float r, float g, float b);
+
+	/// <summary>
 	/// Run the engine
 	/// </summary>
 	void run();
