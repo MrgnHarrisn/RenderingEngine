@@ -3,7 +3,7 @@
 #include <corecrt_malloc.h>
 #include <random>
 #include <iostream>
-
+#include "Utils/Random.h"
 
 World::World()
 {
@@ -19,15 +19,13 @@ void World::readWorld()
 // need to generate a mesh from this or something
 void World::generateTerrain()
 {
-	// setup random generation
-	std::random_device dev;
-	std::mt19937 rng(dev());
-	std::uniform_real_distribution<float> dist(0.f, 1.f);
+	// setup random generation - TODO: Make a seperate class/function for handeling random number gen
+	
 
-	// generate terrain here
+	// generate terrain here (no smoothing just yet)
 	for (size_t i = 0; i < 8; ++i) {
 		for (size_t j = 0; j < 8; ++j) {
-			m_terrain[i * 8 + j] = dist(rng);
+			m_terrain[i * 8 + j] = randomF(0.f, 1.f);
 			std::cout << m_terrain[i * 8 + j] << ", ";
 		}
 		std::cout << std::endl;
