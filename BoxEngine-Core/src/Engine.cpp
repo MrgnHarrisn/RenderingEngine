@@ -9,6 +9,7 @@ Engine::Engine(unsigned int width, unsigned int height, const std::string& title
 {
 	m_window = (Window*)new Window(width, height, title);
 	m_renderer = (Renderer*)new Renderer(m_window);
+	m_world = (World*)new World();
 }
 
 void Engine::setClearColor(float x, float y, float z)
@@ -26,6 +27,8 @@ Engine::~Engine()
 void Engine::init()
 {
 	// do something here?
+	// read in main.berp file to gain data etc.
+	m_world->generateTerrain();
 }
 
 void Engine::run()

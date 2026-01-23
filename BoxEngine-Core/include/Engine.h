@@ -4,6 +4,7 @@
 
 #include "Core/Window.h"
 #include "Renderer/Renderer.h"
+#include "World/World.h"
 
 class Engine
 {
@@ -46,4 +47,5 @@ public:
 private:
 	Window*		m_window	= nullptr;
 	Renderer*	m_renderer	= nullptr;
+	World*		m_world		= nullptr;
 };
