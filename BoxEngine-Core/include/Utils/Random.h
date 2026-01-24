@@ -2,6 +2,7 @@
 
 #include <random>
 
+// should be in a static class?
 static float randomF(float min, float max)
 {
 	std::random_device dev;

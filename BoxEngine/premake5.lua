@@ -21,7 +21,8 @@ project "BoxEngine"
 		"../BoxEngine-Core/%{IncludeDir.glm}",
 		"../BoxEngine-Core/%{IncludeDir.Glad}",
 		"../BoxEngine-Core/%{IncludeDir.GLFW}",
-		"../BoxEngine-Core/%{IncludeDir.ImGui}"
+		"../BoxEngine-Core/%{IncludeDir.ImGui}",
+		"../BoxEngine-Core/%{IncludeDir.assimp}"
 	}
 
 	links

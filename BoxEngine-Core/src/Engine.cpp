@@ -29,6 +29,9 @@ void Engine::init()
 	// do something here?
 	// read in main.berp file to gain data etc.
 	m_world->generateTerrain();
+#ifndef NDEBUG
+	testModelLoading();
+#endif // !NDEBUG
 }
 
 void Engine::run()

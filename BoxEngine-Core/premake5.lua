@@ -55,11 +55,11 @@ project "BoxEngine-Core"
 		}
 
 	filter "configurations:Debug"
-		defines "GLCORE_DEBUG"
+		defines {"GLCORE_DEBUG"}
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "GLCORE_RELEASE"
+		defines {"GLCORE_RELEASE", "NDEBUG"}
 		runtime "Release"
 		optimize "on"
