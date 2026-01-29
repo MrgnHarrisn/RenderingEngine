@@ -58,6 +58,27 @@ void Window::pollEvents()
 	glfwPollEvents();
 }
 
+void Window::makeContextCurrent()
+{
+	glfwMakeContextCurrent(m_window);
+}
+
+void Window::getSize(int& width, int& height)
+{
+	width = m_width;
+	height = m_height;
+}
+
+bool Window::isValid()
+{
+	return m_window != nullptr;
+}
+
+Window::~Window()
+{
+	glfwDestroyWindow(m_window);
+}
+
 void Window::resize_callback()
 {
 	glViewport(0, 0, m_width, m_height);

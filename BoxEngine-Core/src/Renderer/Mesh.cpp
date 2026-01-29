@@ -1,13 +1,16 @@
 #include "Renderer/Mesh.h"
+#include <glad/glad.h>
 #include <algorithm>
 #include <limits>
 #include <cmath>
+#include <iostream>
 
 Mesh::Mesh(const std::vector<Vertex>& vertices,
     const std::vector<unsigned int>& indices)
     : m_vertices(vertices), m_indices(indices)
 {
     calculateBounds();
+    setupBuffers();
 }
 
 Mesh::Mesh(std::vector<Vertex>&& vertices,
@@ -15,28 +18,205 @@ Mesh::Mesh(std::vector<Vertex>&& vertices,
     : m_vertices(std::move(vertices)), m_indices(std::move(indices))
 {
     calculateBounds();
+    setupBuffers();
+}
+
+Mesh::~Mesh()
+{
+    cleanupBuffers();
+}
+
+// Prevent copying because of OpenGL 
+Mesh::Mesh(const Mesh& other)
+    : m_vertices(other.m_vertices), m_indices(other.m_indices),
+    m_minBounds(other.m_minBounds), m_maxBounds(other.m_maxBounds),
+    m_center(other.m_center), m_boundingSphereRadius(other.m_boundingSphereRadius),
+    m_materialName(other.m_materialName)
+{
+    setupBuffers(); // Create new OpenGL buffers ig
+}
+
+Mesh& Mesh::operator=(const Mesh& other)
+{
+    if (this != &other) {
+        cleanupBuffers();
+        m_vertices = other.m_vertices;
+        m_indices = other.m_indices;
+        m_minBounds = other.m_minBounds;
+        m_maxBounds = other.m_maxBounds;
+        m_center = other.m_center;
+        m_boundingSphereRadius = other.m_boundingSphereRadius;
+        m_materialName = other.m_materialName;
+        setupBuffers();
+    }
+    return *this;
+}
+
+// Move operations for meshes
+Mesh::Mesh(Mesh&& other) noexcept
+    : m_vertices(std::move(other.m_vertices)),
+    m_indices(std::move(other.m_indices)),
+    m_minBounds(other.m_minBounds),
+    m_maxBounds(other.m_maxBounds),
+    m_center(other.m_center),
+    m_boundingSphereRadius(other.m_boundingSphereRadius),
+    m_materialName(std::move(other.m_materialName)),
+    m_VAO(other.m_VAO),
+    m_VBO(other.m_VBO),
+    m_EBO(other.m_EBO)
+{
+    other.m_VAO = 0;
+    other.m_VBO = 0;
+    other.m_EBO = 0;
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept
+{
+    if (this != &other) {
+        cleanupBuffers();
+
+        m_vertices = std::move(other.m_vertices);
+        m_indices = std::move(other.m_indices);
+        m_minBounds = other.m_minBounds;
+        m_maxBounds = other.m_maxBounds;
+        m_center = other.m_center;
+        m_boundingSphereRadius = other.m_boundingSphereRadius;
+        m_materialName = std::move(other.m_materialName);
+
+        m_VAO = other.m_VAO;
+        m_VBO = other.m_VBO;
+        m_EBO = other.m_EBO;
+
+        other.m_VAO = 0;
+        other.m_VBO = 0;
+        other.m_EBO = 0;
+    }
+    return *this;
+}
+
+void Mesh::setupBuffers()
+{
+    if (m_vertices.empty()) return;
+
+    // Generate buffers
+    glGenVertexArrays(1, &m_VAO);
+    glGenBuffers(1, &m_VBO);
+    if (!m_indices.empty()) {
+        glGenBuffers(1, &m_EBO);
+    }
+
+    // Bind VAO
+    glBindVertexArray(m_VAO);
+
+    // Bind and set vertex buffer
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex),
+        m_vertices.data(), GL_STATIC_DRAW);
+
+    // Bind and set element buffer if we have indices
+    if (!m_indices.empty()) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int),
+            m_indices.data(), GL_STATIC_DRAW);
+    }
+
+    // Set vertex attribute pointers
+    // Position attribute
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+        (void*)offsetof(Vertex, position));
+
+    // Normal attribute
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+        (void*)offsetof(Vertex, normal));
+
+    // Texture coordinates attribute
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+        (void*)offsetof(Vertex, texCoords));
+
+    // Tangent attribute
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+        (void*)offsetof(Vertex, tangent));
+
+    // Bitangent attribute
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+        (void*)offsetof(Vertex, bitangent));
+
+    // Unbind VAO
+    glBindVertexArray(0);
+}
+
+void Mesh::updateBuffers()
+{
+    if (m_VAO == 0) {
+        setupBuffers();
+        return;
+    }
+
+    // Update vertex buffer data
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex),
+        m_vertices.data(), GL_STATIC_DRAW);
+
+    // Update element buffer if we have indices
+    if (!m_indices.empty() && m_EBO != 0) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int),
+            m_indices.data(), GL_STATIC_DRAW);
+    }
+}
+
+void Mesh::cleanupBuffers()
+{
+    if (m_VAO != 0) {
+        glDeleteVertexArrays(1, &m_VAO);
+        m_VAO = 0;
+    }
+    if (m_VBO != 0) {
+        glDeleteBuffers(1, &m_VBO);
+        m_VBO = 0;
+    }
+    if (m_EBO != 0) {
+        glDeleteBuffers(1, &m_EBO);
+        m_EBO = 0;
+    }
 }
 
 void Mesh::setVertices(const std::vector<Vertex>& vertices)
 {
     m_vertices = vertices;
     calculateBounds();
+    updateBuffers();
 }
 
 void Mesh::setVertices(std::vector<Vertex>&& vertices)
 {
     m_vertices = std::move(vertices);
     calculateBounds();
+    updateBuffers();
 }
 
 void Mesh::setIndices(const std::vector<unsigned int>& indices)
 {
     m_indices = indices;
+    if (m_EBO == 0 && !m_indices.empty()) {
+        // Need to create EBO if it doesn't exist
+        glGenBuffers(1, &m_EBO);
+    }
+    updateBuffers();
 }
 
 void Mesh::setIndices(std::vector<unsigned int>&& indices)
 {
     m_indices = std::move(indices);
+    if (m_EBO == 0 && !m_indices.empty()) {
+        glGenBuffers(1, &m_EBO);
+    }
+    updateBuffers();
 }
 
 void Mesh::calculateBounds()
@@ -83,18 +263,42 @@ void Mesh::calculateBounds()
     m_boundingSphereRadius = std::sqrt(maxDistSq);
 }
 
+void Mesh::draw(const Shader& shader)
+{
+    if (m_vertices.empty() || m_VAO == 0) return;
+
+    // Bind VAO
+    glBindVertexArray(m_VAO);
+
+    // Draw based on whether we have indices or not
+    if (!m_indices.empty()) {
+        glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+    }
+    else {
+        // Draw vertices as triangles (assuming they're triangle lists)
+        glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
+    }
+
+    // Unbind VAO
+    glBindVertexArray(0);
+}
+
 void Mesh::transform(const glm::mat4& transform)
 {
+    glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(transform)));
+
     for (auto& vertex : m_vertices) {
         // Transform position
         glm::vec4 transformedPos = transform * glm::vec4(vertex.position, 1.0f);
         vertex.position = glm::vec3(transformedPos);
 
-        // Transform normal (assuming uniform scaling for now)
-        glm::vec4 transformedNormal = transform * glm::vec4(vertex.normal, 0.0f);
-        vertex.normal = glm::normalize(glm::vec3(transformedNormal));
+        // Transform normal
+        vertex.normal = glm::normalize(normalMatrix * vertex.normal);
 
-        // Note: For non-uniform scaling, we'd need to use the inverse transpose matrix
+        // Transform tangent and bitangent (for normal mapping)
+        vertex.tangent = glm::normalize(normalMatrix * vertex.tangent);
+        vertex.bitangent = glm::normalize(normalMatrix * vertex.bitangent);
     }
-    calculateBounds(); // Recalculate bounds after transformation
+    calculateBounds();
+    updateBuffers(); // Update GPU buffers with new vertex data
 }

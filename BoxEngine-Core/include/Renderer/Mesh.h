@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Shader.h"
 #include "Vertex.h"
 #include <memory>
 #include <string>
@@ -13,6 +14,7 @@ public:
     Mesh() = default;
     Mesh(const std::vector<Vertex>& vertices,
         const std::vector<unsigned int>& indices);
+    Mesh::Mesh(const Mesh& other);
 
     // Add move constructor for efficiency
     Mesh(std::vector<Vertex>&& vertices,
@@ -49,12 +51,31 @@ public:
             m_indices.size() * sizeof(unsigned int);
     }
 
+    void draw(const Shader& shader);
+
     // Transform mesh (for instancing support)
     void transform(const glm::mat4& transform);
+
+    // operator overloading
+    Mesh& Mesh::operator=(const Mesh& other);
+    Mesh::Mesh(Mesh&& other) noexcept;
+    Mesh& Mesh::operator=(Mesh&& other) noexcept;
+
+    ~Mesh();
 
 private:
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
+
+    // OpenGL buffers
+    unsigned int m_VAO = 0;
+    unsigned int m_VBO = 0;
+    unsigned int m_EBO = 0;
+
+    // Add these private methods
+    void setupBuffers();
+    void updateBuffers();
+    void cleanupBuffers();
 
     // bounds
     glm::vec3 m_minBounds;

@@ -36,6 +36,17 @@ public:
 	/// Poll events
 	/// </summary>
 	void pollEvents();
+
+	/// <summary>
+	/// Set context to this window
+	/// </summary>
+	void makeContextCurrent();
+
+	void getSize(int& width, int& height);
+
+	bool isValid();
+
+	~Window();
 private:
 	GLFWwindow* m_window = nullptr;
 	unsigned int m_width, m_height;

@@ -14,10 +14,3 @@ struct Vertex {
     glm::ivec4 boneIDs;
     glm::vec4 boneWeights;
 };
-
-// For simple rendering for now
-struct SimpleVertex {
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 texCoords;
-};

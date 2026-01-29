@@ -21,7 +21,7 @@ public:
 
     // Model information
     const std::string& getFilePath() const { return m_filepath; }
-    const std::vector<std::shared_ptr<Mesh>>& getMeshes() const { return m_meshes; }
+    std::vector<std::shared_ptr<Mesh>>& getMeshes() { return m_meshes; }
 
     // open-world model stuff for LODs
     struct LODLevel {
@@ -46,6 +46,8 @@ public:
 
     // Check if model is valid
     bool isValid() const { return !m_meshes.empty(); }
+
+    ~Model();
 
 private:
     // Process Assimp data

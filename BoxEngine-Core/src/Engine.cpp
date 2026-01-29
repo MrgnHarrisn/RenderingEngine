@@ -12,15 +12,11 @@ Engine::Engine(unsigned int width, unsigned int height, const std::string& title
 	m_world = (World*)new World();
 }
 
-void Engine::setClearColor(float x, float y, float z)
-{
-	m_renderer->setClearColor({ x, y, z });
-}
-
 Engine::~Engine()
 {
 	delete m_window;
 	delete m_renderer;
+	delete m_world;
 	glfwTerminate();
 }
 

@@ -87,7 +87,7 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
     // Pre-allocate memory for efficiency
     vertices.reserve(mesh->mNumVertices);
-    indices.reserve(mesh->mNumFaces * 3); // Assuming triangles
+    indices.reserve(mesh->mNumFaces * 3); // 3 for triangles
 
     // Process vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -227,4 +227,10 @@ void Model::addLODLevel(const std::shared_ptr<Model>& lodModel, float distance)
                 return a.switchDistance < b.switchDistance;
             });
     }
+}
+
+Model::~Model()
+{
+    m_lodLevels.clear();
+    m_meshes.clear();
 }
