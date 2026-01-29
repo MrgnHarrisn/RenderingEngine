@@ -7,7 +7,7 @@
 #include <iostream>
 
 
-float dist = 1;
+float dist = 3;
 
 // this main is completely temporary, it WILL NOT stay like this
 int main() {
@@ -30,7 +30,7 @@ int main() {
 
     // Load a 3D model
     Model model;
-    bool modelLoaded = model.loadFromFile("assets/Models/head/adamHead.gltf");
+    bool modelLoaded = model.loadFromFile("assets/Models/backpack/scene.gltf");
 
     // temporary
     if (!modelLoaded) {
