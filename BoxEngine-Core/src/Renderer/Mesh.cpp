@@ -6,16 +6,19 @@
 #include <iostream>
 
 Mesh::Mesh(const std::vector<Vertex>& vertices,
-    const std::vector<unsigned int>& indices)
-    : m_vertices(vertices), m_indices(indices)
+    const std::vector<unsigned int>& indices,
+    const std::vector<std::shared_ptr<Texture>>& textures)
+    : m_vertices(vertices), m_indices(indices), m_textures(textures)
 {
     calculateBounds();
     setupBuffers();
 }
 
 Mesh::Mesh(std::vector<Vertex>&& vertices,
-    std::vector<unsigned int>&& indices)
-    : m_vertices(std::move(vertices)), m_indices(std::move(indices))
+    std::vector<unsigned int>&& indices,
+    std::vector<std::shared_ptr<Texture>>&& textures)
+    : m_vertices(std::move(vertices)), m_indices(std::move(indices)),
+    m_textures(std::move(textures))
 {
     calculateBounds();
     setupBuffers();
@@ -219,6 +222,28 @@ void Mesh::setIndices(std::vector<unsigned int>&& indices)
     updateBuffers();
 }
 
+void Mesh::addTexture(const std::shared_ptr<Texture>& texture)
+{
+    if (texture && texture->isValid())
+    {
+        m_textures.push_back(texture);
+    }
+}
+
+void Mesh::setTextures(const std::vector<std::shared_ptr<Texture>>& textures)
+{
+    m_textures = textures;
+}
+
+//void Mesh::setMaterial(const glm::vec3& ambient, const glm::vec3& diffuse,
+//    const glm::vec3& specular, float shininess)
+//{
+//    m_ambient = ambient;
+//    m_diffuse = diffuse;
+//    m_specular = specular;
+//    m_shininess = shininess;
+//}
+
 void Mesh::calculateBounds()
 {
     if (m_vertices.empty()) {
@@ -263,9 +288,102 @@ void Mesh::calculateBounds()
     m_boundingSphereRadius = std::sqrt(maxDistSq);
 }
 
+void Mesh::setMaterial(const glm::vec3& ambient, const glm::vec3& diffuse,
+    const glm::vec3& specular, float shininess)
+{
+    m_ambient = ambient;
+    m_diffuse = diffuse;
+    m_specular = specular;
+    m_shininess = shininess;
+}
+
 void Mesh::draw(const Shader& shader)
 {
     if (m_vertices.empty() || m_VAO == 0) return;
+
+    // Bind textures if available
+    unsigned int diffuseNr = 1;
+    unsigned int specularNr = 1;
+    unsigned int normalNr = 1;
+    unsigned int heightNr = 1;
+
+    for (unsigned int i = 0; i < m_textures.size(); i++) {
+        // Activate proper texture unit before binding
+        glActiveTexture(GL_TEXTURE0 + i);
+
+        // Retrieve texture info
+        const auto& texture = m_textures[i];
+        std::string uniformName;
+        std::string number;
+
+        switch (texture->getType()) {
+        case DIFFUSE:
+            number = std::to_string(diffuseNr++);
+            uniformName = "material.texture_diffuse" + number;
+            break;
+        case SPECULAR:
+            number = std::to_string(specularNr++);
+            uniformName = "material.texture_specular" + number;
+            break;
+        case NORMAL:
+            number = std::to_string(normalNr++);
+            uniformName = "material.texture_normal" + number;
+            break;
+        case HEIGHT:
+            number = std::to_string(heightNr++);
+            uniformName = "material.texture_height" + number;
+            break;
+        case AMBIENT:
+            // Ambient textures are usually treated as diffuse
+            number = std::to_string(diffuseNr++);
+            uniformName = "material.texture_diffuse" + number;
+            break;
+        }
+
+        // Only set the uniform if it exists in the shader
+        int uniformLocation = glGetUniformLocation(shader.GetID(), uniformName.c_str());
+        if (uniformLocation != -1) {
+            shader.SetInt(uniformName, i);
+            texture->bind(i);
+        }
+        else {
+            // If the specific uniform doesn't exist, try to use texture_diffuse1
+            if (texture->getType() == DIFFUSE) {
+                int fallbackLocation = glGetUniformLocation(shader.GetID(), "material.texture_diffuse1");
+                if (fallbackLocation != -1) {
+                    shader.SetInt("material.texture_diffuse1", i);
+                    texture->bind(i);
+                }
+            }
+        }
+    }
+
+    // Set material properties
+    int useTexturesLoc = glGetUniformLocation(shader.GetID(), "material.useTextures");
+    if (useTexturesLoc != -1) {
+        shader.SetBool("material.useTextures", !m_textures.empty());
+    }
+
+    // Only set material colors if the shader has these uniforms
+    int ambientLoc = glGetUniformLocation(shader.GetID(), "material.ambient");
+    if (ambientLoc != -1) {
+        shader.SetVec3("material.ambient", m_ambient);
+    }
+
+    int diffuseLoc = glGetUniformLocation(shader.GetID(), "material.diffuse");
+    if (diffuseLoc != -1) {
+        shader.SetVec3("material.diffuse", m_diffuse);
+    }
+
+    int specularLoc = glGetUniformLocation(shader.GetID(), "material.specular");
+    if (specularLoc != -1) {
+        shader.SetVec3("material.specular", m_specular);
+    }
+
+    int shininessLoc = glGetUniformLocation(shader.GetID(), "material.shininess");
+    if (shininessLoc != -1) {
+        shader.SetFloat("material.shininess", m_shininess);
+    }
 
     // Bind VAO
     glBindVertexArray(m_VAO);
@@ -281,6 +399,9 @@ void Mesh::draw(const Shader& shader)
 
     // Unbind VAO
     glBindVertexArray(0);
+
+    // Unbind textures
+    glActiveTexture(GL_TEXTURE0);
 }
 
 void Mesh::transform(const glm::mat4& transform)

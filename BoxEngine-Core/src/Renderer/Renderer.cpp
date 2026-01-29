@@ -136,7 +136,7 @@ void Renderer::endFrame()
     m_target->swapBuffers();
 
     // Optional: Print stats in debug mode
-#ifdef _DEBUG
+#ifdef NDEBUG
     if (m_stats.drawCalls > 0) {
         // std::cout << "Draw calls: " << m_stats.drawCalls 
         //           << ", Triangles: " << m_stats.trianglesDrawn << std::endl;
@@ -156,26 +156,49 @@ void Renderer::render()
     endFrame();
 }
 
-void Renderer::renderModel(Model& model, const glm::mat4& transform)
+void Renderer::renderModel(const Model& model, const glm::mat4& transform)
 {
     if (!model.isValid()) return;
-
+    
     // Use default shader
     m_defaultShader.Use();
-
+    
     // Set matrices
     m_defaultShader.SetMat4("model", transform);
     m_defaultShader.SetMat4("view", m_viewMatrix);
     m_defaultShader.SetMat4("projection", m_projectionMatrix);
-
-    // Set default lighting
-    m_defaultShader.SetVec3("lightPos", glm::vec3(5.0f, 5.0f, 5.0f));
-    m_defaultShader.SetVec3("viewPos", glm::vec3(0.0f, 0.0f, 3.0f));
-    m_defaultShader.SetVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-    m_defaultShader.SetVec3("objectColor", glm::vec3(0.8f, 0.8f, 0.8f));
-    m_defaultShader.SetFloat("ambientStrength", 0.1f);
-    m_defaultShader.SetFloat("specularStrength", 0.5f);
-
+    
+    // Set lighting uniforms (check if they exist first)
+    int lightPosLoc = glGetUniformLocation(m_defaultShader.GetID(), "lightPos");
+    if (lightPosLoc != -1) {
+        m_defaultShader.SetVec3("lightPos", glm::vec3(5.0f, 5.0f, 5.0f));
+    }
+    
+    int viewPosLoc = glGetUniformLocation(m_defaultShader.GetID(), "viewPos");
+    if (viewPosLoc != -1) {
+        m_defaultShader.SetVec3("viewPos", glm::vec3(0.0f, 0.0f, 3.0f));
+    }
+    
+    int lightColorLoc = glGetUniformLocation(m_defaultShader.GetID(), "lightColor");
+    if (lightColorLoc != -1) {
+        m_defaultShader.SetVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    }
+    
+    int objectColorLoc = glGetUniformLocation(m_defaultShader.GetID(), "objectColor");
+    if (objectColorLoc != -1) {
+        m_defaultShader.SetVec3("objectColor", glm::vec3(0.8f, 0.8f, 0.8f));
+    }
+    
+    int ambientStrengthLoc = glGetUniformLocation(m_defaultShader.GetID(), "ambientStrength");
+    if (ambientStrengthLoc != -1) {
+        m_defaultShader.SetFloat("ambientStrength", 0.1f);
+    }
+    
+    int specularStrengthLoc = glGetUniformLocation(m_defaultShader.GetID(), "specularStrength");
+    if (specularStrengthLoc != -1) {
+        m_defaultShader.SetFloat("specularStrength", 0.5f);
+    }
+    
     // Draw all meshes
     for (const auto& mesh : model.getMeshes()) {
         if (mesh) {

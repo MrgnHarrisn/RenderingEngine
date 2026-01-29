@@ -13,8 +13,8 @@ project "BoxEngine-Core"
 		"src/**.cpp",
 		"include/**.h",
 		"include/**.cpp",
-		"vendor/stb_image/**.h",
 		"vendor/stb_image/**.cpp",
+		"vendor/stb_image/**.h",
 		"vendor/glm/glm/**.hpp",
 		"vendor/glm/glm/**.inl",
 	}

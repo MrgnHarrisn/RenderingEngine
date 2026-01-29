@@ -6,6 +6,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
+
+float dist = 1;
+
+// this main is completely temporary, it WILL NOT stay like this
 int main() {
     // Create window
     Window window(800, 600, "3D Renderer");
@@ -26,7 +30,7 @@ int main() {
 
     // Load a 3D model
     Model model;
-    bool modelLoaded = model.loadFromFile("assets/Models/backpack/scene.gltf");
+    bool modelLoaded = model.loadFromFile("assets/Models/head/adamHead.gltf");
 
     // temporary
     if (!modelLoaded) {
@@ -62,12 +66,12 @@ int main() {
         };
 
         std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(vertices, indices);
-        model.getMeshes().push_back(mesh);
+        model.addMesh(mesh);
     }
 
     // Set up camera matrices this should be done in a camera class
     glm::mat4 view = glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 3.0f),
+        glm::vec3(dist, 2.0f, dist),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f)
     );
@@ -91,10 +95,10 @@ int main() {
         modelTransform = glm::rotate(modelTransform, rotation, glm::vec3(0.0f, 1.0f, 0.0f));
 
         // Update camera orbit
-        float camX = sin(rotation) * 3.0f;
-        float camZ = cos(rotation) * 3.0f;
+        float camX = sin(rotation) * dist;
+        float camZ = cos(rotation) * dist;
         view = glm::lookAt(
-            glm::vec3(camX, 1.0f, camZ),
+            glm::vec3(dist, 1.0f, dist),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 1.0f, 0.0f)
         );

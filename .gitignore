@@ -12,6 +12,7 @@
 *.env
 *.sln
 
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 *.stl
@@ -23,6 +24,8 @@ mono_crash.*
 *.vcxproj
 BoxEngine-Core/vendor/GLFW/bin
 BoxEngine-Core/vendor/GLFW/bin-int
+
+BoxEngine/assets/Models
 
 # Build results
 [Dd]ebug/

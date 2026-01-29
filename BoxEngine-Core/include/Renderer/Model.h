@@ -21,7 +21,7 @@ public:
 
     // Model information
     const std::string& getFilePath() const { return m_filepath; }
-    std::vector<std::shared_ptr<Mesh>>& getMeshes() { return m_meshes; }
+    const std::vector<std::shared_ptr<Mesh>>& getMeshes() const { return m_meshes; }
 
     // open-world model stuff for LODs
     struct LODLevel {
@@ -35,6 +35,8 @@ public:
     // memory management
     size_t getTotalMemoryUsage() const;
     void clear();
+
+    void addMesh(const std::shared_ptr<Mesh>& mesh);
 
     // model meta-data
     const glm::vec3& getCenter() const { return m_center; }
@@ -74,4 +76,14 @@ private:
     // For debugging/optimization
     size_t m_totalVertexCount = 0;
     size_t m_totalTriangleCount = 0;
+
+    // Store loaded textures to avoid duplicates
+    std::vector<std::shared_ptr<Texture>> m_loadedTextures;
+
+    // Texture loading helper
+    std::vector<std::shared_ptr<Texture>> loadMaterialTextures(aiMaterial* mat,
+        aiTextureType type,
+        TextureType textureType);
+
+    std::shared_ptr<Texture> Model::createDefaultTexture(TextureType type);
 };

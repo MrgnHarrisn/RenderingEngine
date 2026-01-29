@@ -64,7 +64,7 @@ public:
 	/// </summary>
 	/// <param name="model"></param>
 	/// <param name="transform"></param>
-	void renderModel(Model& model, const glm::mat4& transform);
+	void renderModel(const Model& model, const glm::mat4& transform);
 
 	/// <summary>
 	/// 
